@@ -1,0 +1,18 @@
+{
+  "name": "article-creator-lambda",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@sanity/client": "^6.23.0",
+    "openai": "^4.73.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.145",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  }
+}
