@@ -1,8 +1,7 @@
 import type { APIGatewayProxyEvent, APIGatewayProxyHandler } from "aws-lambda";
 import OpenAI from "openai";
 import { createArticle } from "./create-article.js";
-import { getPrompt } from "./prompt.js";
-import { MOCK_CONTENT } from "./MOCK.js";
+import { USER_PROMPT } from "./prompt.js";
 
 // const OPENAI_MODEL = "gpt-5.2-pro";
 const OPENAI_MODEL = "gpt-4.1";
@@ -35,17 +34,20 @@ export const handler: APIGatewayProxyHandler = async (
       };
     }
 
-    // const openai = new OpenAI({ apiKey });
-    // const completion = await openai.chat.completions.create({
-    //   model: OPENAI_MODEL,
-    //   messages: [{ role: "user", content: getPrompt(topic) }],
-    // });
+    const openai = new OpenAI({ apiKey });
+    console.info("Getting content...");
 
-    // const content =
-    //   completion.choices[0]?.message?.content?.trim() ??
-    //   "No content generated.";
-    const content = MOCK_CONTENT;
-    //removeEytan
+    const completion = await openai.chat.completions.create({
+      model: OPENAI_MODEL,
+      messages: [
+        { role: "user", content: USER_PROMPT },
+        { role: "user", content: `TOPIC: ${topic}` },
+      ],
+    });
+
+    const content =
+      completion.choices[0]?.message?.content?.trim() ??
+      "No content generated.";
 
     const firstLine = content.split(/\n/)[0] ?? "Untitled Article";
     const title = firstLine.replace(/^#+\s*/, "").trim() || "Untitled Article";

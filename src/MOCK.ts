@@ -1,27 +1,38 @@
-export const MOCK_CONTENT = `# 📝 MASTER ARTICLE GENERATOR PROMPT
+export const MOCK_CONTENT = `# Foobar
 
-(Backend / DevOps Content --- Style DNA Embedded)
+Foobar is a Python library for dealing with word pluralization.
 
-------------------------------------------------------------------------
+## Installation
 
-## INSTRUCTIONS FOR AI
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
 
-You are writing a backend / DevOps technical article.
-
-You MUST strictly follow the STYLE DNA rules below.
-
-Return the output in this exact structure:
-
-**bold**
-1.  Article (640--690 words)
-2.  Image Markers embedded in the article
-3.  Image Instructions section
-4.  SEO Package
-5.  LinkedIn Version
-
-Do not omit sections.
-
+\`\`\`bash
+pip install foobar
 \`\`\`
-code example
+
+## Usage
+
+\`\`\`python
+import foobar
+
+# returns 'words'
+foobar.pluralize('word')
+
+# returns 'geese'
+foobar.pluralize('goose')
+
+# returns 'phenomenon'
+foobar.singularize('phenomena')
 \`\`\`
-------------------------------------------------------------------------`;
+
+## Contributing
+
+Pull requests are welcome. For major changes, please open an issue first
+to discuss what you would like to change.
+
+Please make sure to update tests as appropriate.
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)`;
+//removeEytan

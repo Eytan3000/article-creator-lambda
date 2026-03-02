@@ -1,6 +1,4 @@
-export const getPrompt = (
-  topic: string
-) => `You are writing a backend / DevOps technical article.
+export const USER_PROMPT = `You are writing a backend / DevOps technical article.
 
 You MUST strictly follow the STYLE DNA rules below.
 
@@ -132,11 +130,14 @@ production-level insight - Structured formatting
 
 # TOPIC INPUT FORMAT
 
-TOPIC: ${topic}
+TOPIC: User input
 
 AUDIENCE: Backend engineers (1--5 years experience)
 
-CONSTRAINTS: Any special requirements go here.
+CONSTRAINTS: 
+1) Do not show the actual "Phase 1 ...", "Phase 2 ..." titles, instead, think of titles that will be appropriate to the content of each phase.
+2) Add the expressions [START] and [END] before and after the actual article accordingly. This will be used for later parsing and separating the actual article from the other instructions.
+3) The article should start with a body text, not a title (the title is the actual topic that is inserted to this prompt)
 
 ------------------------------------------------------------------------
 
