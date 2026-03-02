@@ -149,9 +149,21 @@ function splitBlocks(
       continue;
     }
 
+    const isListItem = (s: string) => /^[-*]\s/.test(s) || /^\d+\.\s/.test(s);
+
+    if (isListItem(trimmed)) {
+      blocks.push({ style: 'normal', content: trimmed });
+      i += 1;
+      while (i < lines.length && isListItem(lines[i].trim())) {
+        blocks.push({ style: 'normal', content: lines[i].trim() });
+        i += 1;
+      }
+      continue;
+    }
+
     const paraLines: string[] = [trimmed];
     i += 1;
-    while (i < lines.length && lines[i].trim() !== '' && !lines[i].trim().startsWith('```') && !/^#{1,4}\s/.test(lines[i].trim()) && !lines[i].trim().startsWith('> ')) {
+    while (i < lines.length && lines[i].trim() !== '' && !lines[i].trim().startsWith('```') && !/^#{1,4}\s/.test(lines[i].trim()) && !lines[i].trim().startsWith('> ') && !isListItem(lines[i].trim())) {
       paraLines.push(lines[i]);
       i += 1;
     }

@@ -37,22 +37,13 @@ export const handler: APIGatewayProxyHandler = async (
     const openai = new OpenAI({ apiKey });
     console.info("Getting content...");
 
-    // data-snapshot-stub-start: const completion = await openai.chat.completions.create({
-    /* eslint-disable */
-    const completion = JSON.parse(
-      (await import("fs")).readFileSync(
-        "/Users/eytankrief/Dropbox/Coding/articles/article-creator-lambda/.snapshots/snapshots/handler_completion_2026-03-02T17-53-33-999Z.json",
-        "utf8"
-      )
-    ).variables["completion"];
-    /* eslint-enable */
-    // data-snapshot-stub-end
-    //   model: OPENAI_MODEL,
-    //   messages: [
-    //     { role: "user", content: USER_PROMPT },
-    //     { role: "user", content: `TOPIC: ${topic}` },
-    //   ],
-    // });
+    const completion = await openai.chat.completions.create({
+      model: OPENAI_MODEL,
+      messages: [
+        { role: "user", content: USER_PROMPT },
+        { role: "user", content: `TOPIC: ${topic}` },
+      ],
+    });
 
     const content =
       completion.choices[0]?.message?.content?.trim() ??

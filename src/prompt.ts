@@ -138,6 +138,7 @@ CONSTRAINTS:
 1) Do not show the actual "Phase 1 ...", "Phase 2 ..." titles, instead, think of titles that will be appropriate to the content of each phase.
 2) Add the expressions [START] and [END] before and after the actual article accordingly. This will be used for later parsing and separating the actual article from the other instructions.
 3) The article should start with a body text, not a title (the title is the actual topic that is inserted to this prompt)
+4) Style as a quote 1-2 essential phrases that are suitable for a quote styling. Put them at the first and last 1/3 of the actual article part.
 
 ------------------------------------------------------------------------
 
