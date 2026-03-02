@@ -5,9 +5,11 @@
 import type { APIGatewayProxyResult } from "aws-lambda";
 import { handler } from "./index.js";
 
-const topic = process.env.TOPIC ?? "";
+// const topic = process.env.TOPIC ?? "";
+// const topic = "Why Your Backend Is Slow (It's Probably Not the Database)";
+const topic = "Why Your Backend Is Slow (And It’s Probably Not the Database)";
 const event = {
-  queryStringParameters: topic ? { topic } : undefined,
+  queryStringParameters: { topic },
 } as unknown as Parameters<typeof handler>[0];
 const context = {} as Parameters<typeof handler>[1];
 

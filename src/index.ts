@@ -37,20 +37,27 @@ export const handler: APIGatewayProxyHandler = async (
     const openai = new OpenAI({ apiKey });
     console.info("Getting content...");
 
-    const completion = await openai.chat.completions.create({
-      model: OPENAI_MODEL,
-      messages: [
-        { role: "user", content: USER_PROMPT },
-        { role: "user", content: `TOPIC: ${topic}` },
-      ],
-    });
+    // const completion = await openai.chat.completions.create({
+    //   model: OPENAI_MODEL,
+    //   messages: [
+    //     { role: "user", content: USER_PROMPT },
+    //     { role: "user", content: `TOPIC: ${topic}` },
+    //   ],
+    // });
 
-    const content =
-      completion.choices[0]?.message?.content?.trim() ??
-      "No content generated.";
+    // data-snapshot-stub-start: const content =
+    /* eslint-disable */
+    const content = JSON.parse(
+      (await import("fs")).readFileSync(
+        "/Users/eytankrief/Dropbox/Coding/articles/article-creator-lambda/.snapshots/snapshots/handler_content_2026-03-02T13-34-39-231Z.json",
+        "utf8"
+      )
+    ).variables["content"];
+    /* eslint-enable */
+    // data-snapshot-stub-end
+    // completion.choices[0]?.message?.content?.trim() ?? "No content generated.";
 
-    const firstLine = content.split(/\n/)[0] ?? "Untitled Article";
-    const title = firstLine.replace(/^#+\s*/, "").trim() || "Untitled Article";
+    const title = topic || "Untitled Article";
 
     const created = await createArticle({
       title,
