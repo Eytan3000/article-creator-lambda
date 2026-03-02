@@ -5,7 +5,10 @@
 import type { APIGatewayProxyResult } from "aws-lambda";
 import { handler } from "./index.js";
 
-const event = {} as Parameters<typeof handler>[0];
+const topic = process.env.TOPIC ?? "";
+const event = {
+  queryStringParameters: topic ? { topic } : undefined,
+} as unknown as Parameters<typeof handler>[0];
 const context = {} as Parameters<typeof handler>[1];
 
 Promise.resolve(handler(event, context, () => {}))

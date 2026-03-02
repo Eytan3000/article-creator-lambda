@@ -4,8 +4,8 @@ import {
   type PortableTextBlock,
 } from "./markdown-to-portable-text.js";
 
-const PROJECT_ID = process.env.SANITY_PROJECT_ID ?? "3scsmtvn";
-const DATASET = process.env.SANITY_DATASET ?? "production";
+const PROJECT_ID = "3scsmtvn";
+const DATASET = "production";
 
 export const client = createClient({
   projectId: PROJECT_ID,
@@ -35,20 +35,19 @@ export interface CreateArticleOptions {
 export async function createArticle(
   options: CreateArticleOptions
 ): Promise<{ _id: string; title: string }> {
-  const { title, bodyMarkdown = "", id, draft = false } = options;
+  const { title, bodyMarkdown = "", id } = options;
   const slug = slugify(title);
   const body: PortableTextBlock[] = markdownToPortableText(bodyMarkdown);
-  const docId = id ?? `article-${slug}-${Date.now()}`;
-  const documentId = draft ? `drafts.${docId}` : docId;
+  const docId = id ?? `article-${slug}-${Date.now()}-123`;
 
   const doc = {
-    _id: documentId,
-    _type: "article" as const,
-    title,
+    _id: docId,
+    _type: "event" as const,
+    title: `[Draft] ${title}1`,
     slug: { _type: "slug" as const, current: slug },
     body,
   };
-  console.log("PROJECT_ID: ", PROJECT_ID); //removeEytan
+
   const result = await client.createOrReplace(doc);
   return { _id: result._id, title: result.title ?? title };
 }

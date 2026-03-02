@@ -1,14 +1,16 @@
-import type { APIGatewayProxyHandler } from "aws-lambda";
+import type { APIGatewayProxyEvent, APIGatewayProxyHandler } from "aws-lambda";
 import OpenAI from "openai";
 import { createArticle } from "./create-article.js";
+import { getPrompt } from "./prompt.js";
+import { MOCK_CONTENT } from "./MOCK.js";
 
 // const OPENAI_MODEL = "gpt-5.2-pro";
 const OPENAI_MODEL = "gpt-4.1";
 
-const MOCK_PROMPT =
-  "Write a short article (2–3 paragraphs) about the benefits of automated content creation. Use markdown.";
-
-export const handler: APIGatewayProxyHandler = async () => {
+export const handler: APIGatewayProxyHandler = async (
+  event: APIGatewayProxyEvent
+) => {
+  const topic = (event.queryStringParameters?.topic as string) ?? "";
   try {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
@@ -25,32 +27,32 @@ export const handler: APIGatewayProxyHandler = async () => {
         headers: { "Content-Type": "application/json" },
       };
     }
+    if (!topic || topic.trim() === "") {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "topic is required" }),
+        headers: { "Content-Type": "application/json" },
+      };
+    }
 
-    const openai = new OpenAI({ apiKey });
-    // data-snapshot-stub-start: const completion = await openai.chat.completions.create({
-    /* eslint-disable */
-    const completion = JSON.parse(
-      (await import("fs")).readFileSync(
-        "/Users/eytankrief/Dropbox/Coding/articles/article-creator-lambda/.snapshots/snapshots/handler_completion_2026-03-01T21-27-15-417Z.json",
-        "utf8"
-      )
-    ).variables["completion"];
-    /* eslint-enable */
-    // data-snapshot-stub-end
+    // const openai = new OpenAI({ apiKey });
+    // const completion = await openai.chat.completions.create({
     //   model: OPENAI_MODEL,
-    //   messages: [{ role: "user", content: MOCK_PROMPT }],
+    //   messages: [{ role: "user", content: getPrompt(topic) }],
     // });
 
-    const content =
-      completion.choices[0]?.message?.content?.trim() ??
-      "No content generated.";
+    // const content =
+    //   completion.choices[0]?.message?.content?.trim() ??
+    //   "No content generated.";
+    const content = MOCK_CONTENT;
+    //removeEytan
+
     const firstLine = content.split(/\n/)[0] ?? "Untitled Article";
     const title = firstLine.replace(/^#+\s*/, "").trim() || "Untitled Article";
 
     const created = await createArticle({
       title,
       bodyMarkdown: content,
-      draft: true,
     });
 
     return {
