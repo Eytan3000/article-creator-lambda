@@ -7,7 +7,6 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@sanity/block-tools": "^3.70.0",
     "@sanity/client": "^6.23.0",
     "openai": "^4.73.0"
   },

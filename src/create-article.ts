@@ -38,12 +38,12 @@ export async function createArticle(
   const { title, bodyMarkdown = "", id } = options;
   const slug = slugify(title);
   const body: PortableTextBlock[] = markdownToPortableText(bodyMarkdown);
-  const docId = id ?? `article-${slug}-${Date.now()}-123`;
+  const docId = id ?? `article-${slug}-${Date.now()}`;
 
   const doc = {
     _id: docId,
     _type: "event" as const,
-    title: `[Draft] ${title}1`,
+    title: `[Draft] ${title}`,
     slug: { _type: "slug" as const, current: slug },
     body,
   };
