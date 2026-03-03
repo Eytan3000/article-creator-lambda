@@ -4,7 +4,9 @@
  */
 const { env } = require("process");
 const { handler } = require("./dist/handler");
-const topic = "Why Your Backend Is Slow (And It’s Probably Not the Database)";
+// const topic = "Why Your Backend Is Slow (And It’s Probably Not the Database)";
+const topic =
+  "From try-catch Chaos to Clean Error Architecture: 4 Patterns Senior Devs Use";
 const mockEvent = { topic };
 
 handler(mockEvent);

@@ -2,7 +2,6 @@ import type { Handler } from "aws-lambda";
 import { createArticle, client, slugify } from "./create-article";
 import { USER_PROMPT } from "./prompt";
 import OpenAI from "openai";
-import { mockContent } from "./mock_content";
 
 // const OPENAI_MODEL = "gpt-5.2-pro";
 const OPENAI_MODEL = "gpt-4.1";
@@ -45,25 +44,32 @@ export const handler: Handler<unknown, LambdaResponse> = async (
     const openai = new OpenAI({ apiKey });
     console.info("Getting content...");
 
-    // const completion = await openai.chat.completions.create({
-    //   model: OPENAI_MODEL,
-    //   messages: [
-    //     { role: "user", content: USER_PROMPT },
-    //     { role: "user", content: `TOPIC: ${topic}` },
-    //   ],
-    // });
+    const completion = await openai.chat.completions.create({
+      model: OPENAI_MODEL,
+      messages: [
+        { role: "user", content: USER_PROMPT },
+        { role: "user", content: `TOPIC: ${topic}` },
+      ],
+    });
 
-    // const content =
-    //   completion.choices[0]?.message?.content ?? "No content generated.";
-    const content = mockContent;
-    //removeEytan
+    const content =
+      completion.choices[0]?.message?.content ?? "No content generated.";
 
     const title = topic || "Untitled Article";
-
+    const article =
+      content.match(/\[ARTICLE_START\](.*?)\[ARTICLE_END\]/s)?.[1]?.trim() ??
+      "No article content generated.";
     const imagePrompt =
       content
         .match(/\[IMAGE_PROMPT_START\](.*?)\[IMAGE_PROMPT_END\]/s)?.[1]
         ?.trim() ?? "No image prompt generated.";
+
+    const imageAltText =
+      content.match(/\[ALT_TEXT_START\](.*?)\[ALT_TEXT_END\]/s)?.[1]?.trim() ??
+      "No alt text generated.";
+    const imageCaption =
+      content.match(/\[CAPTION_START\](.*?)\[CAPTION_END\]/s)?.[1]?.trim() ??
+      "No caption generated.";
 
     const imageResult = await openai.images.generate({
       model: IMAGE_MODEL,
@@ -83,10 +89,10 @@ export const handler: Handler<unknown, LambdaResponse> = async (
 
     const created = await createArticle({
       title,
-      bodyMarkdown: content,
+      bodyMarkdown: article,
       heroImageAssetId: asset._id,
-      heroImageAlt: imagePrompt.slice(0, 125),
-      heroImageCaption: imagePrompt,
+      heroImageAlt: imageAltText,
+      heroImageCaption: imageCaption,
     });
 
     return {
