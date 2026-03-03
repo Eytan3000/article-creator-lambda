@@ -9,15 +9,13 @@ COPY tsconfig.json ./
 COPY src ./src
 RUN npm run build
 
-FROM node:20-alpine
+FROM public.ecr.aws/lambda/nodejs:20
 
-WORKDIR /app
+WORKDIR ${LAMBDA_TASK_ROOT}
 
 COPY package.json package-lock.json* ./
 RUN npm ci --omit=dev
 
 COPY --from=builder /app/dist ./dist
 
-# For Lambda container images, use AWS base: public.ecr.aws/lambda/nodejs:20
-# and set CMD to your handler (e.g. "handler.handler")
-CMD ["node", "dist/handler.js"]
+CMD ["dist/handler.handler"]
