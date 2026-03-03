@@ -40,8 +40,6 @@ jobs:
             --platform linux/arm64 \
             --provenance=false \
             --sbom=false \
-            -t ${ECR_REGISTRY}/${ECR_REPOSITORY}:arm64 \
-            -t ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG} \
-            -t ${ECR_REGISTRY}/${ECR_REPOSITORY}:latest \
+            -t ${REGISTRY}/${ECR_REPOSITORY}:latest \
             --push \
             .
