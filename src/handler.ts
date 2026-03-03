@@ -1,5 +1,5 @@
 import type { Handler } from "aws-lambda";
-import { createArticle } from "./create-article";
+import { createArticle, client, slugify } from "./create-article";
 import { USER_PROMPT } from "./prompt";
 import OpenAI from "openai";
 import { mockContent } from "./mock_content";
@@ -60,11 +60,6 @@ export const handler: Handler<unknown, LambdaResponse> = async (
 
     const title = topic || "Untitled Article";
 
-    // const created = await createArticle({
-    //   title,
-    //   bodyMarkdown: content,
-    // });
-
     const imagePrompt =
       content
         .match(/\[IMAGE_PROMPT_START\](.*?)\[IMAGE_PROMPT_END\]/s)?.[1]
@@ -75,11 +70,30 @@ export const handler: Handler<unknown, LambdaResponse> = async (
       prompt: imagePrompt,
     });
 
+    const b64 = imageResult.data?.[0]?.b64_json;
+    if (!b64) {
+      throw new Error("No image data returned from OpenAI");
+    }
+    const buffer = Buffer.from(b64, "base64");
+    const slug = slugify(title);
+    const asset = await client.assets.upload("image", buffer, {
+      contentType: "image/png",
+      filename: `hero-${slug}.png`,
+    });
+
+    const created = await createArticle({
+      title,
+      bodyMarkdown: content,
+      heroImageAssetId: asset._id,
+      heroImageAlt: imagePrompt.slice(0, 125),
+      heroImageCaption: imagePrompt,
+    });
+
     return {
       statusCode: 200,
       body: JSON.stringify({
-        // articleId: created._id, // removeEytan
-        // title: created.title, // removeEytan
+        articleId: created._id,
+        title: created.title,
       }),
       headers: { "Content-Type": "application/json" },
     };

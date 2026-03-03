@@ -30,12 +30,18 @@ export interface CreateArticleOptions {
   id?: string;
   /** If true, create as draft (ID prefixed with `drafts.`); review and publish in Studio. */
   draft?: boolean;
+  /** Sanity asset _id of the hero image (from client.assets.upload). */
+  heroImageAssetId?: string;
+  /** Alt text for the hero image (accessibility). */
+  heroImageAlt?: string;
+  /** Caption for the hero image. */
+  heroImageCaption?: string;
 }
 
 export async function createArticle(
   options: CreateArticleOptions
 ): Promise<{ _id: string; title: string }> {
-  const { title, bodyMarkdown = "", id } = options;
+  const { title, bodyMarkdown = "", id, heroImageAssetId, heroImageAlt, heroImageCaption } = options;
   const slug = slugify(title);
   const body: PortableTextBlock[] = markdownToPortableText(bodyMarkdown);
   const docId = id ?? `article-${slug}-${Date.now()}`;
@@ -46,6 +52,14 @@ export async function createArticle(
     title: `[Draft] ${title}`,
     slug: { _type: "slug" as const, current: slug },
     body,
+    ...(heroImageAssetId && {
+      mainImage: {
+        _type: "image" as const,
+        asset: { _type: "reference" as const, _ref: heroImageAssetId },
+        ...(heroImageAlt && { alt: heroImageAlt }),
+        ...(heroImageCaption && { caption: heroImageCaption }),
+      },
+    }),
   };
 
   const result = await client.createOrReplace(doc);
