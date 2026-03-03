@@ -3,8 +3,8 @@ import { createArticle, client, slugify } from "./create-article";
 import { USER_PROMPT } from "./prompt";
 import OpenAI from "openai";
 
-const OPENAI_MODEL = "gpt-5.2-pro";
-// const OPENAI_MODEL = "gpt-4.1";
+// const OPENAI_MODEL = "gpt-5.2-pro";
+const OPENAI_MODEL = "gpt-4.1";
 const IMAGE_MODEL = "gpt-image-1.5";
 
 export interface LambdaResponse {
