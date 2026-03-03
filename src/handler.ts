@@ -2,9 +2,11 @@ import type { Handler } from "aws-lambda";
 import { createArticle } from "./create-article";
 import { USER_PROMPT } from "./prompt";
 import OpenAI from "openai";
+import { mockContent } from "./mock_content";
 
 // const OPENAI_MODEL = "gpt-5.2-pro";
 const OPENAI_MODEL = "gpt-4.1";
+const IMAGE_MODEL = "gpt-image-1.5";
 
 export interface LambdaResponse {
   statusCode: number;
@@ -43,30 +45,41 @@ export const handler: Handler<unknown, LambdaResponse> = async (
     const openai = new OpenAI({ apiKey });
     console.info("Getting content...");
 
-    const completion = await openai.chat.completions.create({
-      model: OPENAI_MODEL,
-      messages: [
-        { role: "user", content: USER_PROMPT },
-        { role: "user", content: `TOPIC: ${topic}` },
-      ],
-    });
+    // const completion = await openai.chat.completions.create({
+    //   model: OPENAI_MODEL,
+    //   messages: [
+    //     { role: "user", content: USER_PROMPT },
+    //     { role: "user", content: `TOPIC: ${topic}` },
+    //   ],
+    // });
 
-    const content =
-      completion.choices[0]?.message?.content?.trim() ??
-      "No content generated.";
+    // const content =
+    //   completion.choices[0]?.message?.content ?? "No content generated.";
+    const content = mockContent;
+    //removeEytan
 
     const title = topic || "Untitled Article";
 
-    const created = await createArticle({
-      title,
-      bodyMarkdown: content,
+    // const created = await createArticle({
+    //   title,
+    //   bodyMarkdown: content,
+    // });
+
+    const imagePrompt =
+      content
+        .match(/\[IMAGE_PROMPT_START\](.*?)\[IMAGE_PROMPT_END\]/s)?.[1]
+        ?.trim() ?? "No image prompt generated.";
+
+    const imageResult = await openai.images.generate({
+      model: IMAGE_MODEL,
+      prompt: imagePrompt,
     });
 
     return {
       statusCode: 200,
       body: JSON.stringify({
-        articleId: created._id,
-        title: created.title,
+        // articleId: created._id, // removeEytan
+        // title: created.title, // removeEytan
       }),
       headers: { "Content-Type": "application/json" },
     };
