@@ -95,7 +95,9 @@ ADDITIONAL INSTRUCTIONS:
 3) The article should start with a body text, not a title (the title is the actual topic that is inserted to this prompt)
 4) Style as a quote 1-2 essential phrases that are suitable for a quote styling. Put them at the first and last 1/3 of the actual article part.
 5) Use day-to-day language that a non-native english speaker from Israel or from France would use
-6) 
+6) always add at the end of an article (before the [ARTICLE_END] expression):
+ "-----
+ Written by Eytan Krief, Backend Engineer."
 
 ------------------------------------------------------------------------
 
