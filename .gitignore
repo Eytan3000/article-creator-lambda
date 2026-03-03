@@ -1,8 +1,8 @@
-node_modules
+node_modules/
+dist/
+*.log
 .env
+.env.*
 .DS_Store
-dist
-.env.local
-.cursor
-.vscode
-.snapshots
+.vscode/
+.snapshots/

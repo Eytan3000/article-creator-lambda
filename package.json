@@ -1,19 +1,23 @@
 {
   "name": "article-creator-lambda",
-  "private": true,
   "version": "1.0.0",
-  "type": "module",
+  "description": "AWS Lambda boilerplate with TypeScript (regular build)",
+  "main": "dist/handler.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "prepackage": "npm run build"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "dependencies": {
-    "@sanity/client": "^6.23.0",
-    "openai": "^4.73.0"
+    "@sanity/client": "^7.16.0",
+    "openai": "^6.25.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.145",
-    "@types/node": "^22.0.0",
-    "tsx": "^4.21.0",
-    "typescript": "^5.6.0"
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0"
   }
 }

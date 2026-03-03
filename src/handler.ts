@@ -1,15 +1,21 @@
-import type { APIGatewayProxyEvent, APIGatewayProxyHandler } from "aws-lambda";
+import type { Handler } from "aws-lambda";
+import { createArticle } from "./create-article";
+import { USER_PROMPT } from "./prompt";
 import OpenAI from "openai";
-import { createArticle } from "./create-article.js";
-import { USER_PROMPT } from "./prompt.js";
 
 // const OPENAI_MODEL = "gpt-5.2-pro";
 const OPENAI_MODEL = "gpt-4.1";
 
-export const handler: APIGatewayProxyHandler = async (
-  event: APIGatewayProxyEvent
-) => {
-  const topic = (event.queryStringParameters?.topic as string) ?? "";
+export interface LambdaResponse {
+  statusCode: number;
+  body: string;
+  headers?: Record<string, string>;
+}
+
+export const handler: Handler<unknown, LambdaResponse> = async (
+  event: unknown
+): Promise<LambdaResponse> => {
+  const { topic } = event as { topic: string };
   try {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
@@ -65,13 +71,10 @@ export const handler: APIGatewayProxyHandler = async (
       headers: { "Content-Type": "application/json" },
     };
   } catch (err) {
-    console.error("Article creator error:", err);
+    console.error(err);
     return {
       statusCode: 500,
-      body: JSON.stringify({
-        error: err instanceof Error ? err.message : "Unknown error",
-      }),
-      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ error: "Internal server error" }),
     };
   }
 };
