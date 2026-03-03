@@ -38,6 +38,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and push
+        id: build
         env:
           REGISTRY: ${{ steps.ecr-login.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
@@ -49,3 +50,21 @@ jobs:
             -t ${REGISTRY}/${ECR_REPOSITORY}:latest \
             --push \
             .
+
+      - name: Deploy Lambda
+        env:
+          REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          IMAGE_URI: ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
+        run: |
+          aws lambda update-function-code \
+            --function-name article-creator-lambda \
+            --image-uri ${IMAGE_URI}
+
+      - name: Wait for Lambda update to complete
+        run: |
+          aws lambda wait function-updated \
+            --function-name article-creator-lambda \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Lambda deployment complete
+        run: echo "Lambda function article-creator-lambda updated successfully with new image"
