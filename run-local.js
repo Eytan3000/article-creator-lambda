@@ -2,11 +2,9 @@
  * Local runner for debugging the Lambda handler.
  * Launch the debugger with this file so breakpoints in src/handler.ts are hit.
  */
-const { env } = require("process");
-const { handler } = require("./dist/handler");
-// const topic = "Why Your Backend Is Slow (And It’s Probably Not the Database)";
-const topic =
-  "From try-catch Chaos to Clean Error Architecture: 4 Patterns Senior Devs Use";
-const mockEvent = { topic };
 
-handler(mockEvent);
+require("dotenv").config();
+
+const { handler } = require("./dist/handler");
+
+handler();

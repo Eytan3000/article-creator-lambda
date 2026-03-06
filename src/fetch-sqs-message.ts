@@ -4,7 +4,9 @@ import {
   DeleteMessageCommand,
 } from "@aws-sdk/client-sqs";
 
-const sqs = new SQSClient({});
+const sqs = new SQSClient({
+  region: "il-central-1",
+});
 
 export interface SqsMessagePayload {
   topic: string;

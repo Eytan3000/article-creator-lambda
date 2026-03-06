@@ -19,7 +19,7 @@ export const handler: Handler<
   LambdaResponse
 > = async (): Promise<LambdaResponse> => {
   const queueUrl = process.env.SQS_QUEUE_URL;
-  console.log("queueUrl", queueUrl);
+
   if (!queueUrl) {
     return {
       statusCode: 500,
@@ -29,7 +29,7 @@ export const handler: Handler<
   }
 
   const message = await fetchMessageFromSqs(queueUrl);
-  console.log("message: ", message); //removeEytan
+
   if (!message) {
     return {
       statusCode: 200,
