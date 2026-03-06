@@ -198,11 +198,9 @@ export function markdownToPortableText(markdown: string): PortableTextBlock[] {
         markDefs: [],
       };
     }
+    const normalizedContent = content.replace(/\n/g, " ").replace(/—/g, " - ");
     const linkDefs: PortableTextLinkDef[] = [];
-    const { children, markDefs } = parseInline(
-      content.replace(/\n/g, " "),
-      linkDefs
-    );
+    const { children, markDefs } = parseInline(normalizedContent, linkDefs);
     return {
       _type: "block",
       _key: key(),
@@ -214,7 +212,7 @@ export function markdownToPortableText(markdown: string): PortableTextBlock[] {
               {
                 _type: "span",
                 _key: key(),
-                text: content.replace(/\n/g, " ") || " ",
+                text: normalizedContent || " ",
                 marks: [],
               },
             ],
