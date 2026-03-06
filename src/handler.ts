@@ -1,6 +1,7 @@
 import type { Handler } from "aws-lambda";
 import { createArticle, client, slugify } from "./create-article";
 import { USER_PROMPT } from "./prompt";
+import { fetchMessageFromSqs, deleteSqsMessage } from "./fetch-sqs-message";
 import OpenAI from "openai";
 
 // const OPENAI_MODEL = "gpt-5.2-pro";
@@ -13,10 +14,31 @@ export interface LambdaResponse {
   headers?: Record<string, string>;
 }
 
-export const handler: Handler<unknown, LambdaResponse> = async (
-  event: unknown
-): Promise<LambdaResponse> => {
-  const { topic } = event as { topic: string };
+export const handler: Handler<
+  unknown,
+  LambdaResponse
+> = async (): Promise<LambdaResponse> => {
+  const queueUrl = process.env.SQS_QUEUE_URL;
+  console.log("queueUrl", queueUrl);
+  if (!queueUrl) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: "SQS_QUEUE_URL is not set" }),
+      headers: { "Content-Type": "application/json" },
+    };
+  }
+
+  const message = await fetchMessageFromSqs(queueUrl);
+  console.log("message: ", message); //removeEytan
+  if (!message) {
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ message: "No message in queue" }),
+      headers: { "Content-Type": "application/json" },
+    };
+  }
+
+  const { topic, receiptHandle } = message;
   try {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
@@ -94,6 +116,8 @@ export const handler: Handler<unknown, LambdaResponse> = async (
       heroImageAlt: imageAltText,
       heroImageCaption: imageCaption,
     });
+
+    await deleteSqsMessage(queueUrl, receiptHandle);
 
     return {
       statusCode: 200,
