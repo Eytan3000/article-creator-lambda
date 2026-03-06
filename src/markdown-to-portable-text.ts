@@ -3,23 +3,23 @@
  * Parses headings, code blocks, blockquotes, and paragraphs; supports inline links, bold, italic, and code.
  */
 
-export type BlockStyle = 'h1' | 'h2' | 'h3' | 'h4' | 'normal' | 'blockquote';
+export type BlockStyle = "h1" | "h2" | "h3" | "h4" | "normal" | "blockquote";
 
 export interface PortableTextSpan {
-  _type: 'span';
+  _type: "span";
   _key: string;
   text: string;
   marks: string[];
 }
 
 export interface PortableTextLinkDef {
-  _type: 'link';
+  _type: "link";
   _key: string;
   href: string;
 }
 
 export interface PortableTextBlock {
-  _type: 'block';
+  _type: "block";
   _key: string;
   style: BlockStyle;
   children: PortableTextSpan[];
@@ -46,35 +46,35 @@ function parseInline(
     if (match.index > lastIndex) {
       const plain = text.slice(lastIndex, match.index);
       if (plain) {
-        children.push({ _type: 'span', _key: key(), text: plain, marks: [] });
+        children.push({ _type: "span", _key: key(), text: plain, marks: [] });
       }
     }
     if (bold1 !== undefined || bold2 !== undefined) {
       children.push({
-        _type: 'span',
+        _type: "span",
         _key: key(),
-        text: bold1 ?? bold2 ?? '',
-        marks: ['strong'],
+        text: bold1 ?? bold2 ?? "",
+        marks: ["strong"],
       });
     } else if (em1 !== undefined || em2 !== undefined) {
       children.push({
-        _type: 'span',
+        _type: "span",
         _key: key(),
-        text: em1 ?? em2 ?? '',
-        marks: ['em'],
+        text: em1 ?? em2 ?? "",
+        marks: ["em"],
       });
     } else if (code !== undefined) {
       children.push({
-        _type: 'span',
+        _type: "span",
         _key: key(),
         text: code,
-        marks: ['code'],
+        marks: ["code"],
       });
     } else if (linkText !== undefined && href !== undefined) {
       const linkKey = key();
-      linkDefs.push({ _type: 'link', _key: linkKey, href });
+      linkDefs.push({ _type: "link", _key: linkKey, href });
       children.push({
-        _type: 'span',
+        _type: "span",
         _key: key(),
         text: linkText,
         marks: [linkKey],
@@ -85,11 +85,11 @@ function parseInline(
   if (lastIndex < text.length) {
     const plain = text.slice(lastIndex);
     if (plain) {
-      children.push({ _type: 'span', _key: key(), text: plain, marks: [] });
+      children.push({ _type: "span", _key: key(), text: plain, marks: [] });
     }
   }
   if (children.length === 0 && text) {
-    children.push({ _type: 'span', _key: key(), text, marks: [] });
+    children.push({ _type: "span", _key: key(), text, marks: [] });
   }
   return { children, markDefs: linkDefs };
 }
@@ -98,7 +98,11 @@ function parseInline(
 function splitBlocks(
   markdown: string
 ): Array<{ style: BlockStyle; content: string; preserveNewlines?: boolean }> {
-  const blocks: Array<{ style: BlockStyle; content: string; preserveNewlines?: boolean }> = [];
+  const blocks: Array<{
+    style: BlockStyle;
+    content: string;
+    preserveNewlines?: boolean;
+  }> = [];
   const lines = markdown.split(/\n/);
   let i = 0;
 
@@ -106,17 +110,17 @@ function splitBlocks(
     const line = lines[i];
     const trimmed = line.trim();
 
-    if (trimmed.startsWith('```')) {
+    if (trimmed.startsWith("```")) {
       const codeLines: string[] = [];
       i += 1;
-      while (i < lines.length && !lines[i].trim().startsWith('```')) {
+      while (i < lines.length && !lines[i].trim().startsWith("```")) {
         codeLines.push(lines[i]);
         i += 1;
       }
       if (i < lines.length) i += 1;
-      const codeContent = codeLines.join('\n');
+      const codeContent = codeLines.join("\n");
       blocks.push({
-        style: 'normal',
+        style: "normal",
         content: codeContent,
         preserveNewlines: true,
       });
@@ -125,26 +129,26 @@ function splitBlocks(
 
     if (/^#{1,4}\s/.test(trimmed)) {
       const level = (trimmed.match(/^(#+)/)?.[1].length ?? 1) as 1 | 2 | 3 | 4;
-      const content = trimmed.replace(/^#+\s*/, '');
+      const content = trimmed.replace(/^#+\s*/, "");
       blocks.push({
-        style: (`h${level}` as BlockStyle),
+        style: `h${level}` as BlockStyle,
         content,
       });
       i += 1;
       continue;
     }
 
-    if (trimmed.startsWith('> ')) {
+    if (trimmed.startsWith("> ")) {
       const quoteLines: string[] = [];
-      while (i < lines.length && lines[i].trim().startsWith('> ')) {
-        quoteLines.push(lines[i].replace(/^>\s?/, ''));
+      while (i < lines.length && lines[i].trim().startsWith("> ")) {
+        quoteLines.push(lines[i].replace(/^>\s?/, ""));
         i += 1;
       }
-      blocks.push({ style: 'blockquote', content: quoteLines.join('\n') });
+      blocks.push({ style: "blockquote", content: quoteLines.join("\n") });
       continue;
     }
 
-    if (trimmed === '') {
+    if (trimmed === "") {
       i += 1;
       continue;
     }
@@ -152,10 +156,10 @@ function splitBlocks(
     const isListItem = (s: string) => /^[-*]\s/.test(s) || /^\d+\.\s/.test(s);
 
     if (isListItem(trimmed)) {
-      blocks.push({ style: 'normal', content: trimmed });
+      blocks.push({ style: "normal", content: trimmed });
       i += 1;
       while (i < lines.length && isListItem(lines[i].trim())) {
-        blocks.push({ style: 'normal', content: lines[i].trim() });
+        blocks.push({ style: "normal", content: lines[i].trim() });
         i += 1;
       }
       continue;
@@ -163,11 +167,18 @@ function splitBlocks(
 
     const paraLines: string[] = [trimmed];
     i += 1;
-    while (i < lines.length && lines[i].trim() !== '' && !lines[i].trim().startsWith('```') && !/^#{1,4}\s/.test(lines[i].trim()) && !lines[i].trim().startsWith('> ') && !isListItem(lines[i].trim())) {
+    while (
+      i < lines.length &&
+      lines[i].trim() !== "" &&
+      !lines[i].trim().startsWith("```") &&
+      !/^#{1,4}\s/.test(lines[i].trim()) &&
+      !lines[i].trim().startsWith("> ") &&
+      !isListItem(lines[i].trim())
+    ) {
       paraLines.push(lines[i]);
       i += 1;
     }
-    blocks.push({ style: 'normal', content: paraLines.join('\n') });
+    blocks.push({ style: "normal", content: paraLines.join("\n") });
   }
 
   return blocks;
@@ -178,20 +189,35 @@ export function markdownToPortableText(markdown: string): PortableTextBlock[] {
   return rawBlocks.map(({ style, content, preserveNewlines }) => {
     if (preserveNewlines) {
       return {
-        _type: 'block',
+        _type: "block",
         _key: key(),
         style,
-        children: [{ _type: 'span', _key: key(), text: content || ' ', marks: [] }],
+        children: [
+          { _type: "span", _key: key(), text: content || " ", marks: ["code"] },
+        ],
         markDefs: [],
       };
     }
     const linkDefs: PortableTextLinkDef[] = [];
-    const { children, markDefs } = parseInline(content.replace(/\n/g, ' '), linkDefs);
+    const { children, markDefs } = parseInline(
+      content.replace(/\n/g, " "),
+      linkDefs
+    );
     return {
-      _type: 'block',
+      _type: "block",
       _key: key(),
       style,
-      children: children.length > 0 ? children : [{ _type: 'span', _key: key(), text: content.replace(/\n/g, ' ') || ' ', marks: [] }],
+      children:
+        children.length > 0
+          ? children
+          : [
+              {
+                _type: "span",
+                _key: key(),
+                text: content.replace(/\n/g, " ") || " ",
+                marks: [],
+              },
+            ],
       markDefs,
     };
   });

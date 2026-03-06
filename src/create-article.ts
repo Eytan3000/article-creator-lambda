@@ -41,7 +41,14 @@ export interface CreateArticleOptions {
 export async function createArticle(
   options: CreateArticleOptions
 ): Promise<{ _id: string; title: string }> {
-  const { title, bodyMarkdown = "", id, heroImageAssetId, heroImageAlt, heroImageCaption } = options;
+  const {
+    title,
+    bodyMarkdown = "",
+    id,
+    heroImageAssetId,
+    heroImageAlt,
+    heroImageCaption,
+  } = options;
   const slug = slugify(title);
   const body: PortableTextBlock[] = markdownToPortableText(bodyMarkdown);
   const docId = id ?? `article-${slug}-${Date.now()}`;
@@ -51,6 +58,7 @@ export async function createArticle(
     _type: "event" as const,
     title: `[Draft] ${title}`,
     slug: { _type: "slug" as const, current: slug },
+    publishedAt: new Date(),
     body,
     ...(heroImageAssetId && {
       mainImage: {

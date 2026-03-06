@@ -4,7 +4,6 @@ import { USER_PROMPT } from "./prompt";
 import { fetchMessageFromSqs, deleteSqsMessage } from "./fetch-sqs-message";
 import OpenAI from "openai";
 
-// const OPENAI_MODEL = "gpt-5.2-pro";
 const OPENAI_MODEL = "gpt-4.1";
 const IMAGE_MODEL = "gpt-image-1.5";
 
@@ -117,7 +116,7 @@ export const handler: Handler<
       heroImageCaption: imageCaption,
     });
 
-    await deleteSqsMessage(queueUrl, receiptHandle);
+    // await deleteSqsMessage(queueUrl, receiptHandle);
 
     return {
       statusCode: 200,
