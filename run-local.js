@@ -5,6 +5,9 @@
 
 require("dotenv").config();
 
+console.log("Starting local handler...");
 const { handler } = require("./dist/handler");
 
-handler();
+handler()
+  .then((result) => console.log("Handler result:", JSON.stringify(result, null, 2)))
+  .catch((err) => console.error("Handler error:", err));
