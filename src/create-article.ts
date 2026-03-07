@@ -42,7 +42,7 @@ export interface CreateArticleOptions {
 
 export async function createArticle(
   options: CreateArticleOptions
-): Promise<{ _id: string; title: string }> {
+): Promise<{ _id: string; title: string; url: string }> {
   const {
     title,
     bodyMarkdown = "",
@@ -75,5 +75,7 @@ export async function createArticle(
   };
 
   const result = await client.createOrReplace(doc);
-  return { _id: result._id, title: result.title ?? title };
+  const baseUrl = "https://eytan-blog-cms.netlify.app";
+  const url = `${baseUrl}/structure/event;${result._id}`;
+  return { _id: result._id, title: result.title ?? title, url };
 }
