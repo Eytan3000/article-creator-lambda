@@ -92,6 +92,11 @@ export const handler: Handler<
       content.match(/\[CAPTION_START\](.*?)\[CAPTION_END\]/s)?.[1]?.trim() ??
       "No caption generated.";
 
+    const linkedinPost =
+      content
+        .match(/\[LINKEDIN_POST_START\](.*?)\[LINKEDIN_POST_END\]/s)?.[1]
+        ?.trim() ?? "No linkedin post generated.";
+
     const imageResult = await openai.images.generate({
       model: IMAGE_MODEL,
       prompt: imagePrompt,

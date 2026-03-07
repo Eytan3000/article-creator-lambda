@@ -73,6 +73,17 @@ Wrap the caption with "[CAPTION_START]" and "[CAPTION_END]" to ease parsing.
 
 ------------------------------------------------------------------------
 
+# LINKEDIN POST
+
+Write a personal, simple, one line linkedin post to publish with this article.
+Add a Personal contact.
+    
+Example:
+“While working on backend services, I realized how important graceful shutdown is in production - so I wrote a short article about it”
+Wrap the linkedin post with "[LINKEDIN_POST_START]" and "[LINKEDIN_POST_END]" to ease parsing.
+
+------------------------------------------------------------------------
+
 # HARD RULES
 
 Do NOT use: - "In today's world" - "Game-changing" - "Revolutionary" -
