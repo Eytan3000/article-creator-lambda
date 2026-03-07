@@ -119,6 +119,7 @@ export const handler: Handler<
       heroImageAssetId: asset._id,
       heroImageAlt: imageAltText,
       heroImageCaption: imageCaption,
+      linkedinPost,
     });
 
     // await deleteSqsMessage(queueUrl, receiptHandle);

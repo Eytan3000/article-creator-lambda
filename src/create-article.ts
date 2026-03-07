@@ -36,6 +36,8 @@ export interface CreateArticleOptions {
   heroImageAlt?: string;
   /** Caption for the hero image. */
   heroImageCaption?: string;
+  /** LinkedIn post text (for event schema linkedinPost field). */
+  linkedinPost?: string;
 }
 
 export async function createArticle(
@@ -48,6 +50,7 @@ export async function createArticle(
     heroImageAssetId,
     heroImageAlt,
     heroImageCaption,
+    linkedinPost,
   } = options;
   const slug = slugify(title);
   const body: PortableTextBlock[] = markdownToPortableText(bodyMarkdown);
@@ -68,6 +71,7 @@ export async function createArticle(
         ...(heroImageCaption && { caption: heroImageCaption }),
       },
     }),
+    ...(linkedinPost !== undefined && { linkedinPost }),
   };
 
   const result = await client.createOrReplace(doc);
