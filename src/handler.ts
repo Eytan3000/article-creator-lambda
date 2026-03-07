@@ -5,7 +5,6 @@ import { fetchMessageFromSqs, deleteSqsMessage } from "./fetch-sqs-message";
 import { notifyArticleFinished } from "./notify-sns";
 import OpenAI from "openai";
 import { SanityImageAssetDocument } from "@sanity/client";
-import { mock } from "./mock";
 
 const OPENAI_MODEL = "gpt-4.1";
 const IMAGE_MODEL = "gpt-image-1.5";
@@ -112,57 +111,52 @@ export const handler: Handler<
   }
 
   try {
-    // const message = await fetchMessageFromSqs(queueUrl);
+    const message = await fetchMessageFromSqs(queueUrl);
 
-    // if (!message) {
-    //   return {
-    //     statusCode: 200,
-    //     body: JSON.stringify({ message: "No message in queue" }),
-    //     headers: { "Content-Type": "application/json" },
-    //   };
-    // }
+    if (!message) {
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ message: "No message in queue" }),
+        headers: { "Content-Type": "application/json" },
+      };
+    }
 
-    // const { topic, receiptHandle } = message;
-    const topic =
-      "From Local Success to Production Failure: A Common Beginner Mistake";
-    //removeEytan
+    const { topic, receiptHandle } = message;
 
-    // const apiKey = process.env.OPENAI_API_KEY;
-    // const validationError = validateRequestEnv(apiKey, topic);
-    // if (validationError) return validationError;
+    const apiKey = process.env.OPENAI_API_KEY;
+    const validationError = validateRequestEnv(apiKey, topic);
+    if (validationError) return validationError;
 
-    // const openai = new OpenAI({ apiKey });
-    // console.info("Getting content...");
+    const openai = new OpenAI({ apiKey });
+    console.info("Getting content...");
 
-    // const completion = await openai.chat.completions.create({
-    //   model: OPENAI_MODEL,
-    //   messages: [
-    //     { role: "user", content: USER_PROMPT },
-    //     { role: "user", content: `TOPIC: ${topic}` },
-    //   ],
-    // });
-    // console.info("Content generated");
-    // const content =
-    //   completion.choices[0]?.message?.content ?? "No content generated.";
-    const content = mock;
+    const completion = await openai.chat.completions.create({
+      model: OPENAI_MODEL,
+      messages: [
+        { role: "user", content: USER_PROMPT },
+        { role: "user", content: `TOPIC: ${topic}` },
+      ],
+    });
+    console.info("Content generated");
+    const content =
+      completion.choices[0]?.message?.content ?? "No content generated.";
 
     const title = topic || "Untitled Article";
     const { article, imagePrompt, imageAltText, imageCaption, linkedinPost } =
       parseGeneratedContent(content);
 
-    // const asset = await generateAndUploadHeroImage(openai, imagePrompt, title);
+    const asset = await generateAndUploadHeroImage(openai, imagePrompt, title);
 
     const created = await createArticle({
       title,
       bodyMarkdown: article,
-      // heroImageAssetId: asset._id,
-      // heroImageAlt: imageAltText,
-      // heroImageCaption: imageCaption,
+      heroImageAssetId: asset._id,
+      heroImageAlt: imageAltText,
+      heroImageCaption: imageCaption,
       linkedinPost,
     });
 
-    // await deleteSqsMessage(queueUrl, receiptHandle);
-    //removeEytan
+    await deleteSqsMessage(queueUrl, receiptHandle);
 
     const topicArn = process.env.SNS_TOPIC_ARN;
     if (topicArn) {
