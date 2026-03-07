@@ -154,7 +154,7 @@ export const handler: Handler<
       linkedinPost,
     });
 
-    await deleteSqsMessage(queueUrl, receiptHandle);
+    // await deleteSqsMessage(queueUrl, receiptHandle);
 
     return {
       statusCode: 200,
