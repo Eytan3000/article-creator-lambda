@@ -2,6 +2,7 @@ import type { Handler } from "aws-lambda";
 import { createArticle, client, slugify } from "./create-article";
 import { USER_PROMPT } from "./prompt";
 import { fetchMessageFromSqs, deleteSqsMessage } from "./fetch-sqs-message";
+import { notifyArticleFinished } from "./notify-sns";
 import OpenAI from "openai";
 import { SanityImageAssetDocument } from "@sanity/client";
 import { mock } from "./mock";
@@ -162,6 +163,15 @@ export const handler: Handler<
 
     // await deleteSqsMessage(queueUrl, receiptHandle);
     //removeEytan
+
+    const topicArn = process.env.SNS_TOPIC_ARN;
+    if (topicArn) {
+      await notifyArticleFinished(topicArn, {
+        url: created.url,
+        articleId: created._id,
+        title: created.title,
+      });
+    }
 
     return {
       statusCode: 200,
