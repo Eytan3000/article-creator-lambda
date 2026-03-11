@@ -116,6 +116,7 @@ export const handler: Handler<
     console.info({ message }, "Message fetched: ");
 
     if (!message) {
+      console.info("No message in queue, returning 200");
       return {
         statusCode: 200,
         body: JSON.stringify({ message: "No message in queue" }),
