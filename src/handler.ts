@@ -2,7 +2,7 @@ import type { Handler } from "aws-lambda";
 import { createArticle, client, slugify } from "./create-article";
 import { USER_PROMPT } from "./prompt";
 import { fetchMessageFromSqs, deleteSqsMessage } from "./fetch-sqs-message";
-import { notifyArticleFinished } from "./notify-sns";
+import { notifyArticleFinished, notifyArticleFailed } from "./notify-sns";
 import OpenAI from "openai";
 import { SanityImageAssetDocument } from "@sanity/client";
 
@@ -117,6 +117,10 @@ export const handler: Handler<
 
     if (!message) {
       console.info("No message in queue, returning 200");
+      const topicArn = process.env.SNS_TOPIC_ARN;
+      if (topicArn) {
+        await notifyArticleFailed(topicArn, { reason: "Queue is empty" });
+      }
       return {
         statusCode: 200,
         body: JSON.stringify({ message: "No message in queue" }),
@@ -151,9 +155,11 @@ export const handler: Handler<
       parseGeneratedContent(content);
 
     console.info("Generating hero image...");
+
     const asset = await generateAndUploadHeroImage(openai, imagePrompt, title);
     console.info({ asset }, "Hero image generated and uploaded");
     console.info("Creating article...");
+
     const created = await createArticle({
       title,
       bodyMarkdown: article,
@@ -164,9 +170,12 @@ export const handler: Handler<
     });
     console.info({ created }, "Article created");
     console.info("Deleting message from SQS...");
+
     await deleteSqsMessage(queueUrl, receiptHandle);
     console.info("Message deleted");
+
     const topicArn = process.env.SNS_TOPIC_ARN;
+
     if (topicArn) {
       console.info("Notifying article finished...");
       await notifyArticleFinished(topicArn, {
@@ -176,6 +185,7 @@ export const handler: Handler<
       });
     }
     console.info("Article created successfully");
+
     return {
       statusCode: 200,
       body: JSON.stringify({
