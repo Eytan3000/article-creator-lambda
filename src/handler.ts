@@ -15,6 +15,7 @@ function parseGeneratedContent(content: string): {
   imageAltText: string;
   imageCaption: string;
   linkedinPost: string;
+  tagsRaw: string;
 } {
   const article =
     content.match(/\[ARTICLE_START\](.*?)\[ARTICLE_END\]/s)?.[1]?.trim() ??
@@ -34,7 +35,16 @@ function parseGeneratedContent(content: string): {
       .match(/\[LINKEDIN_POST_START\](.*?)\[LINKEDIN_POST_END\]/s)?.[1]
       ?.trim()
       .replace(/—/g, " - ") ?? "No linkedin post generated.";
-  return { article, imagePrompt, imageAltText, imageCaption, linkedinPost };
+  const tagsRaw =
+    content.match(/\[TAGS_START\](.*?)\[TAGS_END\]/s)?.[1]?.trim() ?? "";
+  return {
+    article,
+    imagePrompt,
+    imageAltText,
+    imageCaption,
+    linkedinPost,
+    tagsRaw,
+  };
 }
 
 async function generateAndUploadHeroImage(
@@ -151,9 +161,20 @@ export const handler: Handler<
       completion.choices[0]?.message?.content ?? "No content generated.";
 
     const title = topic || "Untitled Article";
-    const { article, imagePrompt, imageAltText, imageCaption, linkedinPost } =
-      parseGeneratedContent(content);
-
+    const {
+      article,
+      imagePrompt,
+      imageAltText,
+      imageCaption,
+      linkedinPost,
+      tagsRaw,
+    } = parseGeneratedContent(content);
+    const tags = tagsRaw
+      ? tagsRaw
+          .split(/[\n,]+/)
+          .map((t) => t.trim())
+          .filter(Boolean)
+      : [];
     console.info("Generating hero image...");
 
     const asset = await generateAndUploadHeroImage(openai, imagePrompt, title);
@@ -167,6 +188,7 @@ export const handler: Handler<
       heroImageAlt: imageAltText,
       heroImageCaption: imageCaption,
       linkedinPost,
+      ...(tags.length > 0 && { tags }),
     });
     console.info({ created }, "Article created");
     console.info("Deleting message from SQS...");

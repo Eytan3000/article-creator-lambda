@@ -84,6 +84,13 @@ Wrap the linkedin post with "[LINKEDIN_POST_START]" and "[LINKEDIN_POST_END]" to
 
 ------------------------------------------------------------------------
 
+# TAGS
+
+Write a list of 5 tags that are relevant to the article.
+Wrap the tags with "[TAGS_START]" and "[TAGS_END]" to ease parsing.
+
+------------------------------------------------------------------------
+
 # HARD RULES
 
 Do NOT use: - "In today's world" - "Game-changing" - "Revolutionary" -
@@ -98,7 +105,7 @@ production-level insight - Structured formatting
 
 TOPIC: User input
 
-AUDIENCE: Backend engineers (1--5 years experience)
+AUDIENCE: Backend engineers (1-5 years experience)
 
 ADDITIONAL INSTRUCTIONS: 
 1) Do not show the actual "Phase 1 ...", "Phase 2 ..." titles, instead, think of titles that will be appropriate to the content of each phase.
@@ -109,6 +116,7 @@ ADDITIONAL INSTRUCTIONS:
 6) always add at the end of an article (before the [ARTICLE_END] expression):
  "Written by Eytan Krief, Backend Engineer."
 7) wrap each code block with \`\`\` and \`\`\` to ease parsing.
+8) Code examples should be in TypeScript, JavaScript, bash, or yaml.
 
 ------------------------------------------------------------------------
 
