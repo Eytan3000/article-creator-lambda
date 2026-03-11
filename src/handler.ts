@@ -111,7 +111,9 @@ export const handler: Handler<
   }
 
   try {
+    console.info("Fetching message from SQS...");
     const message = await fetchMessageFromSqs(queueUrl);
+    console.info({ message }, "Message fetched: ");
 
     if (!message) {
       return {
@@ -122,11 +124,13 @@ export const handler: Handler<
     }
 
     const { topic, receiptHandle } = message;
+    console.info({ topic, receiptHandle }, "Topic and receipt handle: ");
 
     const apiKey = process.env.OPENAI_API_KEY;
     const validationError = validateRequestEnv(apiKey, topic);
     if (validationError) return validationError;
 
+    console.info("Validating request environment...");
     const openai = new OpenAI({ apiKey });
     console.info("Getting content...");
 
@@ -145,8 +149,10 @@ export const handler: Handler<
     const { article, imagePrompt, imageAltText, imageCaption, linkedinPost } =
       parseGeneratedContent(content);
 
+    console.info("Generating hero image...");
     const asset = await generateAndUploadHeroImage(openai, imagePrompt, title);
-
+    console.info({ asset }, "Hero image generated and uploaded");
+    console.info("Creating article...");
     const created = await createArticle({
       title,
       bodyMarkdown: article,
@@ -155,18 +161,20 @@ export const handler: Handler<
       heroImageCaption: imageCaption,
       linkedinPost,
     });
-
+    console.info({ created }, "Article created");
+    console.info("Deleting message from SQS...");
     await deleteSqsMessage(queueUrl, receiptHandle);
-
+    console.info("Message deleted");
     const topicArn = process.env.SNS_TOPIC_ARN;
     if (topicArn) {
+      console.info("Notifying article finished...");
       await notifyArticleFinished(topicArn, {
         url: created.url,
         articleId: created._id,
         title: created.title,
       });
     }
-
+    console.info("Article created successfully");
     return {
       statusCode: 200,
       body: JSON.stringify({
