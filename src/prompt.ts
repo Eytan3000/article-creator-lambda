@@ -76,7 +76,7 @@ Wrap the caption with "[CAPTION_START]" and "[CAPTION_END]" to ease parsing.
 # LINKEDIN POST
 
 Write a personal, simple, one line linkedin post to publish with this article.
-Add a Personal contact.
+Add a personal appeal.
     
 Example:
 “While working on backend services, I realized how important graceful shutdown is in production - so I wrote a short article about it”
